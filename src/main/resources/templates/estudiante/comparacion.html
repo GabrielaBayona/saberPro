@@ -47,6 +47,17 @@
                 <h2>📈 Comparación con Otros Estudiantes</h2>
                 <p class="text-muted">Análisis de tu posición relativa en el grupo</p>
             </div>
+			
+			<!-- ALERTA PARA ESTUDIANTES ANULADOS -->
+			<div th:if="${estudiante.estado == 'ANULADO'}" class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
+			    <h4 class="alert-heading">🚫 Prueba Anulada</h4>
+			    <hr>
+			    <p class="mb-0">
+			        <strong>Tu prueba fue anulada por el ICFES.</strong> No puedes ser comparado con otros estudiantes 
+			        porque tus resultados no son válidos. Todos los valores mostrados están en cero.
+			    </p>
+			    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			</div>
 
             <!-- MI POSICIÓN -->
             <div class="card shadow-lg mb-4 border-primary" style="border-width: 3px;">
@@ -99,38 +110,47 @@
                 </div>
             </div>
 
-            <!-- DISTRIBUCIÓN VISUAL -->
-            <div class="card shadow-lg mb-4">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">📊 Distribución Visual en el Ranking</h5>
-                </div>
-                <div class="card-body">
-                    <h6 class="mb-3 text-center">Tu Posición Relativa</h6>
-                    <div class="progress" style="height: 50px; font-size: 1.1rem;">
-                        <div class="progress-bar bg-danger d-flex align-items-center justify-content-center" 
-                             th:style="'width: ' + (${mejoresPuntajes} * 100.0 / ${totalEstudiantes}) + '%;'"
-                             th:text="${mejoresPuntajes} + ' mejores que tú'">
-                        </div>
-                        <div class="progress-bar d-flex align-items-center justify-content-center fw-bold" 
-                             style="width: 3%; background-color: #ffc107 !important; color: #000 !important;">
-                            TÚ
-                        </div>
-                        <div class="progress-bar bg-primary d-flex align-items-center justify-content-center" 
-                             th:style="'width: ' + (${menoresPuntajes} * 100.0 / ${totalEstudiantes}) + '%;'"
-                             th:text="${menoresPuntajes} + ' por debajo tuyo'">
-                        </div>
-                    </div>
-                    <div class="text-center mt-4">
-                        <p class="lead mb-2">
-                            Estás en el <strong>percentil <span th:text="${percentilTexto}">85.3</span>%</strong>
-                        </p>
-                        <p class="text-muted">
-                            Esto significa que superaste al <strong><span th:text="${percentilTexto}">85.3</span>%</strong> 
-                            de los estudiantes que presentaron la prueba
-                        </p>
-                    </div>
-                </div>
-            </div>
+			<!-- DISTRIBUCIÓN VISUAL -->
+			<div class="card shadow-lg mb-4">
+			    <div class="card-header bg-success text-white">
+			        <h5 class="mb-0">📊 Distribución Visual en el Ranking</h5>
+			    </div>
+			    <div class="card-body">
+			        <h6 class="mb-3 text-center">Tu Posición Relativa</h6>
+			        
+			        <!-- Mensaje especial para estudiantes anulados -->
+			        <div th:if="${estudiante.estado == 'ANULADO'}" class="alert alert-secondary text-center">
+			            <p class="mb-0">No hay datos de comparación disponibles para pruebas anuladas.</p>
+			        </div>
+			        
+			        <!-- Barra de progreso (solo para estudiantes activos) -->
+			        <div th:unless="${estudiante.estado == 'ANULADO'}">
+			            <div class="progress" style="height: 50px; font-size: 1.1rem;">
+			                <div class="progress-bar bg-danger d-flex align-items-center justify-content-center" 
+			                     th:style="'width: ' + (${totalEstudiantes} > 0 ? (${mejoresPuntajes} * 100.0 / ${totalEstudiantes}) : 0) + '%;'"
+			                     th:text="${mejoresPuntajes} > 0 ? (${mejoresPuntajes} + ' mejores que tú') : ''">
+			                </div>
+			                <div class="progress-bar d-flex align-items-center justify-content-center fw-bold" 
+			                     style="width: 3%; background-color: #ffc107 !important; color: #000 !important;">
+			                    TÚ
+			                </div>
+			                <div class="progress-bar bg-primary d-flex align-items-center justify-content-center" 
+			                     th:style="'width: ' + (${totalEstudiantes} > 0 ? (${menoresPuntajes} * 100.0 / ${totalEstudiantes}) : 0) + '%;'"
+			                     th:text="${menoresPuntajes} > 0 ? (${menoresPuntajes} + ' por debajo tuyo') : ''">
+			                </div>
+			            </div>
+			            <div class="text-center mt-4">
+			                <p class="lead mb-2">
+			                    Estás en el <strong>percentil <span th:text="${percentilTexto}">85.3</span>%</strong>
+			                </p>
+			                <p class="text-muted">
+			                    Esto significa que superaste al <strong><span th:text="${percentilTexto}">85.3</span>%</strong> 
+			                    de los estudiantes que presentaron la prueba
+			                </p>
+			            </div>
+			        </div>
+			    </div>
+			</div>
 
             <!-- COMPARACIÓN DE PUNTAJES -->
             <div class="card shadow-lg mb-4">
