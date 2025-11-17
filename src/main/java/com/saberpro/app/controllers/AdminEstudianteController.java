@@ -6,11 +6,8 @@ import com.saberpro.app.repositories.EstudianteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.ArrayList;
@@ -35,11 +32,9 @@ public class AdminEstudianteController {
         List<Estudiante> anulados = new ArrayList<>();
         
         if (busqueda != null && !busqueda.trim().isEmpty()) {
-            // Buscar por apellido o número de registro (incluye TODOS los estados)
             List<Estudiante> todosResultados = estudianteRepository.findByPrimerApellidoContainingIgnoreCaseOrNumeroRegistroContaining(
                 busqueda, busqueda);
             
-            // Separar activos de anulados
             estudiantes = new ArrayList<>();
             for (Estudiante e : todosResultados) {
                 if ("ANULADO".equals(e.getEstado())) {
@@ -52,14 +47,12 @@ public class AdminEstudianteController {
             model.addAttribute("busqueda", busqueda);
             model.addAttribute("mostrandoResultados", true);
         } else {
-            // Listar estudiantes activos
             estudiantes = estudianteRepository.findByEstadoOrderByPuntajeSaberProDesc("ACTIVO");
-            // Listar estudiantes anulados
             anulados = estudianteRepository.findByEstado("ANULADO");
             model.addAttribute("mostrandoResultados", false);
         }
 
-        // Calcular estadísticas solo de activos
+        // Calcular estadísticas
         double promedio = 0;
         int maximo = 0;
         int minimo = 0;
@@ -78,7 +71,6 @@ public class AdminEstudianteController {
                 if (puntaje > maximo) maximo = puntaje;
                 if (puntaje < minimo) minimo = puntaje;
                 
-                // Contar niveles
                 if ("Nivel 4".equals(e.getNivelSaberPro())) nivel4++;
                 else if ("Nivel 3".equals(e.getNivelSaberPro())) nivel3++;
                 else if ("Nivel 2".equals(e.getNivelSaberPro())) nivel2++;
@@ -122,5 +114,202 @@ public class AdminEstudianteController {
         model.addAttribute("usuario", usuario);
         
         return "admin/estudiante-detalle";
+    }
+
+    // ============================================
+    // NUEVOS MÉTODOS PARA CREAR/EDITAR ESTUDIANTE
+    // ============================================
+
+    @GetMapping("/nuevo")
+    public String mostrarFormularioNuevo(HttpSession session, Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null || !"ADMIN".equals(usuario.getRol())) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("estudiante", new Estudiante());
+        model.addAttribute("usuario", usuario);
+        model.addAttribute("modoEdicion", false);
+        
+        return "admin/estudiante-form";
+    }
+
+    @GetMapping("/editar/{id}")
+    public String mostrarFormularioEditar(@PathVariable Long id, HttpSession session, Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null || !"ADMIN".equals(usuario.getRol())) {
+            return "redirect:/login";
+        }
+
+        Estudiante estudiante = estudianteRepository.findById(id).orElse(null);
+        
+        if (estudiante == null) {
+            return "redirect:/admin/estudiantes";
+        }
+
+        model.addAttribute("estudiante", estudiante);
+        model.addAttribute("usuario", usuario);
+        model.addAttribute("modoEdicion", true);
+        
+        return "admin/estudiante-form";
+    }
+
+    @PostMapping("/guardar")
+    public String guardar(@ModelAttribute Estudiante estudiante, 
+                         HttpSession session,
+                         RedirectAttributes redirectAttributes) {
+        
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null || !"ADMIN".equals(usuario.getRol())) {
+            return "redirect:/login";
+        }
+
+        try {
+            // Calcular automáticamente los niveles basados en los puntajes
+            calcularNiveles(estudiante);
+            
+            // Calcular puntaje promedio general
+            calcularPuntajeGeneral(estudiante);
+            
+            estudianteRepository.save(estudiante);
+            
+            redirectAttributes.addFlashAttribute("success", 
+                "✅ Estudiante guardado exitosamente");
+            
+            return "redirect:/admin/estudiantes";
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", 
+                "❌ Error al guardar el estudiante: " + e.getMessage());
+            return "redirect:/admin/estudiantes/nuevo";
+        }
+    }
+
+    @PostMapping("/eliminar/{id}")
+    public String eliminar(@PathVariable Long id, 
+                          HttpSession session,
+                          RedirectAttributes redirectAttributes) {
+        
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null || !"ADMIN".equals(usuario.getRol())) {
+            return "redirect:/login";
+        }
+
+        try {
+            estudianteRepository.deleteById(id);
+            redirectAttributes.addFlashAttribute("success", 
+                "🗑️ Estudiante eliminado exitosamente");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", 
+                "❌ Error al eliminar el estudiante");
+        }
+        
+        return "redirect:/admin/estudiantes";
+    }
+
+    // ============================================
+    // MÉTODOS AUXILIARES
+    // ============================================
+
+    private void calcularNiveles(Estudiante est) {
+        // Comunicación Escrita
+        if (est.getComunicacionEscrita() != null) {
+            est.setComunicacionEscritaNivel(obtenerNivel(est.getComunicacionEscrita()));
+        }
+        
+        // Razonamiento Cuantitativo
+        if (est.getRazonamientoCuantitativo() != null) {
+            est.setRazonamientoCuantitativoNivel(obtenerNivel(est.getRazonamientoCuantitativo()));
+        }
+        
+        // Lectura Crítica
+        if (est.getLecturaCritica() != null) {
+            est.setLecturaCriticaNivel(obtenerNivel(est.getLecturaCritica()));
+        }
+        
+        // Competencias Ciudadanas
+        if (est.getCompetenciasCiudadanas() != null) {
+            est.setCompetenciasCiudadanasNivel(obtenerNivel(est.getCompetenciasCiudadanas()));
+        }
+        
+        // Inglés
+        if (est.getIngles() != null) {
+            est.setInglesNivel(obtenerNivel(est.getIngles()));
+            est.setNivelIngles(obtenerNivelIngles(est.getIngles()));
+        }
+        
+        // Formulación de Proyectos
+        if (est.getFormulacionProyectos() != null) {
+            est.setFormulacionProyectosNivel(obtenerNivel(est.getFormulacionProyectos()));
+        }
+        
+        // Pensamiento Científico
+        if (est.getPensamientoCientifico() != null) {
+            est.setPensamientoCientificoNivel(obtenerNivel(est.getPensamientoCientifico()));
+        }
+        
+        // Diseño de Software
+        if (est.getDisenoSoftware() != null) {
+            est.setDisenoSoftwareNivel(obtenerNivel(est.getDisenoSoftware()));
+        }
+    }
+
+    private String obtenerNivel(int puntaje) {
+        if (puntaje >= 180) return "Nivel 4";
+        if (puntaje >= 150) return "Nivel 3";
+        if (puntaje >= 120) return "Nivel 2";
+        return "Nivel 1";
+    }
+
+    private String obtenerNivelIngles(int puntaje) {
+        if (puntaje >= 200) return "B2";
+        if (puntaje >= 160) return "B1";
+        if (puntaje >= 130) return "A2";
+        if (puntaje >= 100) return "A1";
+        return "A0";
+    }
+
+    private void calcularPuntajeGeneral(Estudiante est) {
+        int suma = 0;
+        int cantidad = 0;
+
+        if (est.getComunicacionEscrita() != null) {
+            suma += est.getComunicacionEscrita();
+            cantidad++;
+        }
+        if (est.getRazonamientoCuantitativo() != null) {
+            suma += est.getRazonamientoCuantitativo();
+            cantidad++;
+        }
+        if (est.getLecturaCritica() != null) {
+            suma += est.getLecturaCritica();
+            cantidad++;
+        }
+        if (est.getCompetenciasCiudadanas() != null) {
+            suma += est.getCompetenciasCiudadanas();
+            cantidad++;
+        }
+        if (est.getIngles() != null) {
+            suma += est.getIngles();
+            cantidad++;
+        }
+        if (est.getFormulacionProyectos() != null) {
+            suma += est.getFormulacionProyectos();
+            cantidad++;
+        }
+        if (est.getPensamientoCientifico() != null) {
+            suma += est.getPensamientoCientifico();
+            cantidad++;
+        }
+        if (est.getDisenoSoftware() != null) {
+            suma += est.getDisenoSoftware();
+            cantidad++;
+        }
+
+        if (cantidad > 0) {
+            int promedio = suma / cantidad;
+            est.setPuntajeSaberPro(promedio);
+            est.setNivelSaberPro(obtenerNivel(promedio));
+        }
     }
 }

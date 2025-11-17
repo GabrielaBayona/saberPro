@@ -17,6 +17,11 @@
             <!-- HEADER CON BÚSQUEDA -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h3 class="mb-0">📚 Lista de Estudiantes</h3>
+				
+				<!-- BOTÓN NUEVO ESTUDIANTE -->
+				        <a th:href="@{/admin/estudiantes/nuevo}" class="btn btn-success">
+				            ➕ Nuevo Estudiante
+				        </a>
                 
                 <div class="d-flex gap-2">
                     <!-- BUSCADOR COMPACTO -->
@@ -215,12 +220,26 @@
                                               th:text="${estudiante.estado}">ACTIVO</span>
                                     </td>
                                     
-                                    <td class="text-center">
-                                        <a th:href="@{/admin/estudiantes/{id}(id=${estudiante.id})}" 
-                                           class="btn btn-sm btn-info">
-                                            👁️ Ver
-                                        </a>
-                                    </td>
+									<td class="text-center">
+									    <div class="btn-group" role="group">
+									        <a th:href="@{/admin/estudiantes/{id}(id=${estudiante.id})}" 
+									           class="btn btn-sm btn-info"
+									           title="Ver detalle">
+									            👁️
+									        </a>
+									        <a th:href="@{/admin/estudiantes/editar/{id}(id=${estudiante.id})}" 
+									           class="btn btn-sm btn-warning"
+									           title="Editar">
+									            ✏️
+									        </a>
+									        <button type="button" 
+									                class="btn btn-sm btn-danger" 
+									                onclick="confirmarEliminacion([[${estudiante.id}]], '[[${estudiante.primerApellido}]]')"
+									                title="Eliminar">
+									            🗑️
+									        </button>
+									    </div>
+									</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -319,6 +338,19 @@
 			        z-index: 10;
 			    }
 			</style>
+			
+			<script>
+			function confirmarEliminacion(id, apellido) {
+			    if (confirm('¿Está seguro de eliminar al estudiante ' + apellido + '?\n\nEsta acción no se puede deshacer.')) {
+			        // Crear formulario dinámico para enviar POST
+			        const form = document.createElement('form');
+			        form.method = 'POST';
+			        form.action = '/admin/estudiantes/eliminar/' + id;
+			        document.body.appendChild(form);
+			        form.submit();
+			    }
+			}
+			</script>
 
 			</body>
 			</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="layout/admin-layout :: head('Formulario Estudiante')"></head>
+
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- SIDEBAR -->
+        <div th:replace="layout/admin-layout :: sidebar"></div>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="col-md-10 p-4">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 th:text="${modoEdicion} ? '✏️ Editar Estudiante' : '➕ Registrar Nuevo Estudiante'">
+                    ➕ Registrar Nuevo Estudiante
+                </h3>
+                <a th:href="@{/admin/estudiantes}" class="btn btn-secondary">
+                    ⬅️ Volver a la Lista
+                </a>
+            </div>
+
+            <!-- MENSAJES -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- FORMULARIO -->
+            <form th:action="@{/admin/estudiantes/guardar}" method="post" th:object="${estudiante}">
+                
+                <input type="hidden" th:field="*{id}" />
+
+                <!-- DATOS PERSONALES -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">📋 Datos Personales</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            
+                            <div class="col-md-3">
+                                <label class="form-label">Tipo de Documento <span class="text-danger">*</span></label>
+                                <select class="form-select" th:field="*{tipoDocumento}" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="CC">CC - Cédula de Ciudadanía</option>
+                                    <option value="TI">TI - Tarjeta de Identidad</option>
+                                    <option value="CE">CE - Cédula de Extranjería</option>
+                                    <option value="PAS">PAS - Pasaporte</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Número de Documento</label>
+                                <input type="text" class="form-control" th:field="*{numeroDocumento}" 
+                                       placeholder="Ej: 1098765432">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Número de Registro <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" th:field="*{numeroRegistro}" 
+                                       placeholder="Ej: EK20183007722" required>
+                                <small class="text-muted">Código del ICFES</small>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Primer Apellido <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" th:field="*{primerApellido}" 
+                                       placeholder="Ej: GARCÍA" required style="text-transform: uppercase;">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Segundo Apellido</label>
+                                <input type="text" class="form-control" th:field="*{segundoApellido}" 
+                                       placeholder="Ej: LÓPEZ" style="text-transform: uppercase;">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Primer Nombre</label>
+                                <input type="text" class="form-control" th:field="*{primerNombre}" 
+                                       placeholder="Ej: JUAN" style="text-transform: uppercase;">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Segundo Nombre</label>
+                                <input type="text" class="form-control" th:field="*{segundoNombre}" 
+                                       placeholder="Ej: CARLOS" style="text-transform: uppercase;">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Correo Electrónico</label>
+                                <input type="email" class="form-control" th:field="*{correoElectronico}" 
+                                       placeholder="estudiante@ejemplo.com">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Número Telefónico</label>
+                                <input type="tel" class="form-control" th:field="*{numeroTelefonico}" 
+                                       placeholder="3001234567">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Estado <span class="text-danger">*</span></label>
+                                <select class="form-select" th:field="*{estado}" required>
+                                    <option value="ACTIVO">✅ ACTIVO</option>
+                                    <option value="ANULADO">🚫 ANULADO</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COMPETENCIAS BÁSICAS -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">📊 Competencias Básicas</h5>
+                        <small>Los niveles se calculan automáticamente según el puntaje</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            
+                            <div class="col-md-3">
+                                <label class="form-label">✍️ Comunicación Escrita</label>
+                                <input type="number" class="form-control" th:field="*{comunicacionEscrita}" 
+                                       placeholder="0-250" min="0" max="250">
+                                <small class="text-muted">Nivel 4: ≥180 | Nivel 3: ≥150 | Nivel 2: ≥120</small>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">🔢 Razonamiento Cuantitativo</label>
+                                <input type="number" class="form-control" th:field="*{razonamientoCuantitativo}" 
+                                       placeholder="0-250" min="0" max="250">
+                                <small class="text-muted">Nivel 4: ≥180 | Nivel 3: ≥150 | Nivel 2: ≥120</small>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">📖 Lectura Crítica</label>
+                                <input type="number" class="form-control" th:field="*{lecturaCritica}" 
+                                       placeholder="0-250" min="0" max="250">
+                                <small class="text-muted">Nivel 4: ≥180 | Nivel 3: ≥150 | Nivel 2: ≥120</small>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">🏛️ Competencias Ciudadanas</label>
+                                <input type="number" class="form-control" th:field="*{competenciasCiudadanas}" 
+                                       placeholder="0-250" min="0" max="250">
+                                <small class="text-muted">Nivel 4: ≥180 | Nivel 3: ≥150 | Nivel 2: ≥120</small>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COMPETENCIAS ESPECÍFICAS -->
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">🎓 Competencias Específicas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            
+                            <div class="col-md-3">
+                                <label class="form-label">🌍 Inglés</label>
+                                <input type="number" class="form-control" th:field="*{ingles}" 
+                                       placeholder="0-250" min="0" max="250">
+                                <small class="text-muted">B2: ≥200 | B1: ≥160 | A2: ≥130 | A1: ≥100</small>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">📐 Formulación de Proyectos</label>
+                                <input type="number" class="form-control" th:field="*{formulacionProyectos}" 
+                                       placeholder="0-250" min="0" max="250">
+                                <small class="text-muted">Nivel 4: ≥180 | Nivel 3: ≥150 | Nivel 2: ≥120</small>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">🔬 Pensamiento Científico</label>
+                                <input type="number" class="form-control" th:field="*{pensamientoCientifico}" 
+                                       placeholder="0-250" min="0" max="250">
+                                <small class="text-muted">Nivel 4: ≥180 | Nivel 3: ≥150 | Nivel 2: ≥120</small>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">💻 Diseño de Software</label>
+                                <input type="number" class="form-control" th:field="*{disenoSoftware}" 
+                                       placeholder="0-250" min="0" max="250">
+                                <small class="text-muted">Nivel 4: ≥180 | Nivel 3: ≥150 | Nivel 2: ≥120</small>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INFORMACIÓN AUTOMÁTICA -->
+                <div class="alert alert-info">
+                    <strong>ℹ️ Información:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>El <strong>Puntaje Saber Pro</strong> se calcula automáticamente como el promedio de todas las competencias.</li>
+                        <li>Los <strong>Niveles</strong> se asignan automáticamente según los puntajes ingresados.</li>
+                        <li>Los campos marcados con <span class="text-danger">*</span> son obligatorios.</li>
+                    </ul>
+                </div>
+
+                <!-- BOTONES -->
+                <div class="d-flex justify-content-between">
+                    <a th:href="@{/admin/estudiantes}" class="btn btn-secondary btn-lg">
+                        ❌ Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <span th:if="${modoEdicion}">💾 Actualizar Estudiante</span>
+                        <span th:unless="${modoEdicion}">✅ Guardar Estudiante</span>
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Validación de puntajes
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+        input.addEventListener('input', function() {
+            if (this.value < 0) this.value = 0;
+            if (this.value > 250) this.value = 250;
+        });
+    });
+</script>
+
+</body>
+</html>
