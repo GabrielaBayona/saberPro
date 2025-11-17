@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="layout/admin-layout :: head('Gestión de Usuarios')"></head>
+
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- SIDEBAR -->
+        <div th:replace="layout/admin-layout :: sidebar"></div>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="col-md-10 p-4">
+            
+            <!-- HEADER -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0">👥 Gestión de Usuarios</h3>
+                <div class="d-flex gap-2">
+                    <a th:href="@{/admin/usuarios/nuevo}" class="btn btn-success">
+                        ➕ Nuevo Usuario
+                    </a>
+                    <a th:href="@{/admin/dashboard}" class="btn btn-secondary">
+                        ⬅️ Volver
+                    </a>
+                </div>
+            </div>
+
+            <!-- MENSAJES -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                ✅ <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                ❌ <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+			<!-- ESTADÍSTICAS -->
+			<div class="row g-3 mb-4">
+			    <div class="col-md-4">
+			        <div class="card text-center p-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+			            <small>Total Usuarios</small>
+			            <h2 th:text="${usuarios != null ? usuarios.size() : 0}">0</h2>
+			        </div>
+			    </div>
+			    <div class="col-md-4">
+			        <div class="card text-center p-3" style="background: linear-gradient(135deg, #6aa700 0%, #a5c31f 100%); color: white;">
+			            <small>Administradores</small>
+			            <h2 th:text="${usuarios != null ? #lists.size(usuarios.?[rol == 'ADMIN']) : 0}">0</h2>
+			        </div>
+			    </div>
+			    <div class="col-md-4">
+			        <div class="card text-center p-3" style="background: linear-gradient(135deg, #c0d72c 0%, #9edc3b 100%); color: #000;">
+			            <small>Usuarios Regulares</small>
+			            <h2 th:text="${usuarios != null ? #lists.size(usuarios.?[rol == 'USUARIO']) : 0}">0</h2>
+			        </div>
+			    </div>
+			</div>
+
+			<!-- TABLA DE USUARIOS -->
+			<div class="card shadow-lg">
+			    <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+			        <h5 class="mb-0">
+			            📋 Listado de Usuarios 
+			            <span class="badge bg-light text-dark" th:text="${usuarios.size()}">0</span>
+			        </h5>
+			    </div>
+			    <div class="card-body p-0">
+			        
+			        <!-- MENSAJE SI NO HAY USUARIOS -->
+			        <div th:if="${usuarios == null or usuarios.isEmpty()}" class="text-center p-5">
+			            <div style="font-size: 4rem;">👥</div>
+			            <h4 class="text-muted mt-3">No hay usuarios registrados</h4>
+			            <a th:href="@{/admin/usuarios/nuevo}" class="btn btn-success mt-3">
+			                ➕ Crear primer usuario
+			            </a>
+			        </div>
+
+			        <!-- TABLA CON USUARIOS -->
+			        <div th:if="${usuarios != null and !usuarios.isEmpty()}" class="table-responsive">
+			            <table class="table table-hover table-striped mb-0">
+			                <thead class="table-dark">
+			                    <tr>
+			                        <th class="text-center">#</th>
+			                        <th>Correo Electrónico</th>
+			                        <th class="text-center">Rol</th>
+			                        <th class="text-center">ID</th>
+			                        <th class="text-center">Acciones</th>
+			                    </tr>
+			                </thead>
+			                <tbody>
+			                    <tr th:each="user, iter : ${usuarios}" class="align-middle">
+			                        <td class="text-center">
+			                            <strong th:text="${iter.count}">1</strong>
+			                        </td>
+			                        
+			                        <td>
+			                            <div class="d-flex align-items-center">
+			                                <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+			                                     style="width: 40px; height: 40px; font-weight: bold;">
+			                                    <span th:text="${#strings.substring(user.correo, 0, 1).toUpperCase()}">A</span>
+			                                </div>
+			                                <div>
+			                                    <strong th:text="${user.correo}">admin@uts.edu.co</strong>
+			                                    <br>
+			                                    <small class="text-muted" th:if="${user.id == usuario.id}">(Tú)</small>
+			                                </div>
+			                            </div>
+			                        </td>
+			                        
+			                        <td class="text-center">
+			                            <span class="badge fs-6 px-3 py-2" 
+			                                  th:classappend="${user.rol == 'ADMIN'} ? 'bg-danger' : 'bg-primary'"
+			                                  th:text="${user.rol}">ADMIN</span>
+			                        </td>
+			                        
+			                        <td class="text-center">
+			                            <code th:text="${user.id}">1</code>
+			                        </td>
+			                        
+									<td class="text-center">
+									    <div class="btn-group" role="group">
+									        <a th:href="@{/admin/usuarios/editar/{id}(id=${user.id})}" 
+									           class="btn btn-sm btn-warning"
+									           title="Editar">
+									            ✏️ Editar
+									        </a>
+									        
+									        <button th:if="${user.id != usuario.id}"
+									                type="button" 
+									                class="btn btn-sm btn-danger btn-eliminar"
+									                th:attr="data-id=${user.id}, data-correo=${user.correo}"
+									                title="Eliminar">
+									            🗑️ Eliminar
+									        </button>
+									        
+									        <button th:if="${user.id == usuario.id}"
+									                type="button" 
+									                class="btn btn-sm btn-secondary"
+									                disabled
+									                title="No puedes eliminar tu propio usuario">
+									            🔒 Protegido
+									        </button>
+									    </div>
+									</td>
+			                    </tr>
+			                </tbody>
+			            </table>
+			        </div>
+			    </div>
+			</div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">⚠️ Confirmar Eliminación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar el usuario?</p>
+                <p class="text-danger"><strong id="usuarioEliminar"></strong></p>
+                <p class="text-muted small">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <a id="btnConfirmarEliminar" href="#" class="btn btn-danger">Eliminar Usuario</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Event delegation para los botones de eliminar
+    document.addEventListener('DOMContentLoaded', function() {
+        const botonesEliminar = document.querySelectorAll('.btn-eliminar');
+        
+        botonesEliminar.forEach(function(boton) {
+            boton.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const correo = this.getAttribute('data-correo');
+                confirmarEliminar(id, correo);
+            });
+        });
+    });
+
+    function confirmarEliminar(id, correo) {
+        document.getElementById('usuarioEliminar').textContent = correo;
+        document.getElementById('btnConfirmarEliminar').href = '/admin/usuarios/eliminar/' + id;
+        
+        const modal = new bootstrap.Modal(document.getElementById('modalEliminar'));
+        modal.show();
+    }
+</script>
+
+<style>
+    tbody tr:hover {
+        background-color: rgba(192, 215, 44, 0.1) !important;
+        transform: scale(1.01);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s;
+    }
+</style>
+
+</body>
+</html>

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="layout/admin-layout :: head('Estadísticas')"></head>
+
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- SIDEBAR -->
+        <div th:replace="layout/admin-layout :: sidebar"></div>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="col-md-10 p-4">
+            
+            <!-- HEADER -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0">📈 Estadísticas Saber TyT</h3>
+                <div class="d-flex gap-2">
+                    <button onclick="window.print()" class="btn btn-info">
+                        🖨️ Imprimir
+                    </button>
+                    <a th:href="@{/admin/dashboard}" class="btn btn-secondary">
+                        ⬅️ Volver
+                    </a>
+                </div>
+            </div>
+
+            <!-- ESTADÍSTICAS GENERALES -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center p-3 h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        <small>Total Estudiantes</small>
+                        <h1 th:text="${total}">34</h1>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center p-3 h-100" style="background: linear-gradient(135deg, #6aa700 0%, #a5c31f 100%); color: white;">
+                        <small>Promedio General</small>
+                        <h1 th:text="${promedio}">142.5</h1>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center p-3 h-100" style="background: linear-gradient(135deg, #c0d72c 0%, #9edc3b 100%); color: #000;">
+                        <small>Puntaje Máximo</small>
+                        <h1 th:text="${maximo}">200</h1>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center p-3 h-100" style="background: linear-gradient(135deg, #ff4757 0%, #ff6348 100%); color: white;">
+                        <small>Puntaje Mínimo</small>
+                        <h1 th:text="${minimo}">96</h1>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRÁFICOS PRINCIPALES -->
+            <div class="row g-4 mb-4">
+                
+                <!-- DISTRIBUCIÓN POR NIVEL -->
+                <div class="col-md-6">
+                    <div class="card shadow-lg">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">📊 Distribución por Nivel</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="chartNiveles" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DISTRIBUCIÓN POR RANGO DE PUNTAJE -->
+                <div class="col-md-6">
+                    <div class="card shadow-lg">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">📊 Distribución por Rango de Puntaje</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="chartRangos" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- PROMEDIOS POR COMPETENCIA -->
+            <div class="card shadow-lg mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📚 Promedios por Competencia Básica</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="chartCompetenciasBasicas" height="100"></canvas>
+                </div>
+            </div>
+
+            <!-- PROMEDIOS COMPETENCIAS ESPECÍFICAS -->
+            <div class="card shadow-lg mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">💻 Promedios por Competencia Específica</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="chartCompetenciasEspecificas" height="100"></canvas>
+                </div>
+            </div>
+
+            <!-- DISTRIBUCIÓN NIVEL INGLÉS -->
+            <div class="card shadow-lg mb-4">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h5 class="mb-0">🌍 Distribución Nivel de Inglés</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <canvas id="chartIngles" height="150"></canvas>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Nivel</th>
+                                            <th class="text-center">Cantidad</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>A0 (Principiante)</td>
+                                            <td class="text-center"><span class="badge bg-danger" th:text="${inglesA0}">0</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>A1 (Básico)</td>
+                                            <td class="text-center"><span class="badge bg-warning" th:text="${inglesA1}">0</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>A2 (Pre-intermedio)</td>
+                                            <td class="text-center"><span class="badge bg-info" th:text="${inglesA2}">0</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>B1 (Intermedio)</td>
+                                            <td class="text-center"><span class="badge bg-primary" th:text="${inglesB1}">0</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>B2 (Intermedio-Alto)</td>
+                                            <td class="text-center"><span class="badge bg-success" th:text="${inglesB2}">0</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANÁLISIS DE INCENTIVOS -->
+            <div class="card shadow-lg mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">🎁 Análisis de Incentivos UTS</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="p-3 border rounded">
+                                <h2 class="text-success" th:text="${rango170_200}">2</h2>
+                                <p class="mb-0"><strong>Excelente</strong></p>
+                                <small class="text-muted">> 171 puntos</small>
+                                <br>
+                                <small>Nota 5.0 + 100% beca</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 border rounded">
+                                <h2 class="text-warning" th:text="${rango150_170}">3</h2>
+                                <p class="mb-0"><strong>Muy Bueno</strong></p>
+                                <small class="text-muted">151-170 puntos</small>
+                                <br>
+                                <small>Nota 4.7 + 50% beca</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 border rounded">
+                                <h2 class="text-primary" th:text="${rango120_150}">8</h2>
+                                <p class="mb-0"><strong>Bueno</strong></p>
+                                <small class="text-muted">120-150 puntos</small>
+                                <br>
+                                <small>Nota 4.5</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 border rounded">
+                                <h2 class="text-secondary" th:text="${rango80_120 + rango0_80}">21</h2>
+                                <p class="mb-0"><strong>Sin Incentivo</strong></p>
+                                <small class="text-muted">< 120 puntos</small>
+                                <br>
+                                <small>Sin beneficios</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script th:inline="javascript">
+    // Gráfico de Niveles (Donut)
+    const ctxNiveles = document.getElementById('chartNiveles');
+    new Chart(ctxNiveles, {
+        type: 'doughnut',
+        data: {
+            labels: ['Nivel 4', 'Nivel 3', 'Nivel 2', 'Nivel 1'],
+            datasets: [{
+                data: [
+                    /*[[${nivel4}]]*/ 2,
+                    /*[[${nivel3}]]*/ 5,
+                    /*[[${nivel2}]]*/ 18,
+                    /*[[${nivel1}]]*/ 9
+                ],
+                backgroundColor: [
+                    'rgba(40, 167, 69, 0.8)',
+                    'rgba(0, 123, 255, 0.8)',
+                    'rgba(255, 193, 7, 0.8)',
+                    'rgba(108, 117, 125, 0.8)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Gráfico de Rangos (Bar)
+    const ctxRangos = document.getElementById('chartRangos');
+    new Chart(ctxRangos, {
+        type: 'bar',
+        data: {
+            labels: ['< 80', '80-119', '120-150', '151-170', '> 171'],
+            datasets: [{
+                label: 'Cantidad de Estudiantes',
+                data: [
+                    /*[[${rango0_80}]]*/ 1,
+                    /*[[${rango80_120}]]*/ 20,
+                    /*[[${rango120_150}]]*/ 8,
+                    /*[[${rango150_170}]]*/ 3,
+                    /*[[${rango170_200}]]*/ 2
+                ],
+                backgroundColor: [
+                    'rgba(220, 53, 69, 0.7)',
+                    'rgba(108, 117, 125, 0.7)',
+                    'rgba(0, 123, 255, 0.7)',
+                    'rgba(255, 193, 7, 0.7)',
+                    'rgba(40, 167, 69, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(220, 53, 69, 1)',
+                    'rgba(108, 117, 125, 1)',
+                    'rgba(0, 123, 255, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(40, 167, 69, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Gráfico Competencias Básicas (Radar)
+    const ctxBasicas = document.getElementById('chartCompetenciasBasicas');
+    new Chart(ctxBasicas, {
+        type: 'radar',
+        data: {
+            labels: ['Comunicación Escrita', 'Razonamiento Cuantitativo', 'Lectura Crítica', 'Competencias Ciudadanas'],
+            datasets: [{
+                label: 'Promedio',
+                data: [
+                    /*[[${promComEscrita}]]*/ 128.5,
+                    /*[[${promRazCuant}]]*/ 142.3,
+                    /*[[${promLecCrit}]]*/ 138.7,
+                    /*[[${promCompCiu}]]*/ 145.2
+                ],
+                backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                borderColor: 'rgba(102, 126, 234, 1)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                pointBorderColor: '#fff',
+                pointRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 250
+                }
+            }
+        }
+    });
+
+    // Gráfico Competencias Específicas (Bar Horizontal)
+    const ctxEspecificas = document.getElementById('chartCompetenciasEspecificas');
+    new Chart(ctxEspecificas, {
+        type: 'bar',
+        data: {
+            labels: ['Inglés', 'Formulación de Proyectos', 'Pensamiento Científico', 'Diseño de Software'],
+            datasets: [{
+                label: 'Promedio',
+                data: [
+                    /*[[${promIngles}]]*/ 140.2,
+                    /*[[${promFormProy}]]*/ 135.8,
+                    /*[[${promPensCien}]]*/ 125.4,
+                    /*[[${promDisSoft}]]*/ 138.6
+                ],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 206, 86, 0.7)',
+                    'rgba(75, 192, 192, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: 250
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Gráfico Nivel Inglés (Pie)
+    const ctxIngles = document.getElementById('chartIngles');
+    new Chart(ctxIngles, {
+        type: 'pie',
+        data: {
+            labels: ['A0', 'A1', 'A2', 'B1', 'B2'],
+            datasets: [{
+                data: [
+                    /*[[${inglesA0}]]*/ 5,
+                    /*[[${inglesA1}]]*/ 8,
+                    /*[[${inglesA2}]]*/ 12,
+                    /*[[${inglesB1}]]*/ 7,
+                    /*[[${inglesB2}]]*/ 2
+                ],
+                backgroundColor: [
+                    'rgba(220, 53, 69, 0.7)',
+                    'rgba(255, 193, 7, 0.7)',
+                    'rgba(23, 162, 184, 0.7)',
+                    'rgba(0, 123, 255, 0.7)',
+                    'rgba(40, 167, 69, 0.7)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'right'
+                }
+            }
+        }
+    });
+</script>
+
+<style>
+    @media print {
+        .sidebar, .btn, nav { display: none !important; }
+        .col-md-10 { width: 100% !important; max-width: 100% !important; }
+    }
+</style>
+
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identificación - Saber TyT</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- SIDEBAR ESTUDIANTE -->
+        <nav class="col-md-2 sidebar p-3">
+            <h4 class="mb-4">🎓 Mi Panel</h4>
+            
+            <div class="nav flex-column">
+                <a th:href="@{/estudiante/dashboard}">📊 Dashboard</a>
+                <a th:href="@{/estudiante/identificacion}" class="active">🆔 Identificación</a>
+                <a th:href="@{/estudiante/resultado-global}">🎯 Resultado Global</a>
+                <a th:href="@{/estudiante/resultados-asignaturas}">📚 Resultados por Asignatura</a>
+                <a th:href="@{/estudiante/beneficio}">🎁 Mi Beneficio</a>
+                <a th:href="@{/estudiante/comparacion}">📈 Comparación</a>
+                <hr class="bg-white my-3">
+                <a th:href="@{/logout}" class="text-danger">🚪 Cerrar Sesión</a>
+            </div>
+        </nav>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="col-md-10 p-4">
+            
+            <!-- BREADCRUMB -->
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/estudiante/dashboard}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Identificación</li>
+                </ol>
+            </nav>
+
+            <!-- HEADER -->
+            <div class="mb-4">
+                <h2>🆔 Identificación del Estudiante</h2>
+                <p class="text-muted">Información personal y de registro en la prueba Saber TyT</p>
+            </div>
+
+            <!-- TARJETA PRINCIPAL DE IDENTIFICACIÓN -->
+            <div class="card shadow-lg mb-4">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h5 class="mb-0">📋 Datos del Estudiante</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded">
+                                <p class="mb-2 text-muted"><strong>📝 Número de Registro ICFES</strong></p>
+                                <h4 class="mb-0"><code th:text="${estudiante.numeroRegistro}">EK20183007722</code></h4>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded">
+                                <p class="mb-2 text-muted"><strong>🆔 Tipo de Documento</strong></p>
+                                <h4 class="mb-0" th:text="${estudiante.tipoDocumento}">CC</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded">
+                                <p class="mb-2 text-muted"><strong>👤 Primer Apellido</strong></p>
+                                <h4 class="mb-0" th:text="${estudiante.primerApellido}">BARBOSA</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded">
+                                <p class="mb-2 text-muted"><strong>👥 Segundo Apellido</strong></p>
+                                <h4 class="mb-0" th:text="${estudiante.segundoApellido}">GARCÍA</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ESTADO Y NIVEL -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="card shadow h-100">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted mb-3">📊 Estado de la Prueba</h6>
+                            <span class="badge bg-success fs-4 px-4 py-3" th:text="${estudiante.estado}">ACTIVO</span>
+                            <hr>
+                            <p class="text-muted mb-0">
+                                <small>Tu prueba está registrada y los resultados son oficiales</small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow h-100">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted mb-3">🎓 Nivel Alcanzado</h6>
+                            <span class="badge bg-info fs-4 px-4 py-3" th:text="${estudiante.nivelSaberPro}">Nivel 4</span>
+                            <hr>
+                            <p class="text-muted mb-0">
+                                <small>Clasificación según desempeño en la prueba</small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INFORMACIÓN ADICIONAL -->
+            <div class="card shadow-lg mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">📌 Información Importante</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading">💡 Acerca de tu Identificación</h6>
+                        <hr>
+                        <ul class="mb-0">
+                            <li>El <strong>Número de Registro</strong> es único y te identifica en el sistema ICFES</li>
+                            <li>Usa este número para consultar resultados oficiales en la página del ICFES</li>
+                            <li>El <strong>Estado ACTIVO</strong> confirma que tu prueba fue presentada y calificada exitosamente</li>
+                            <li>Tu <strong>Nivel</strong> se determina según tu desempeño global en todas las competencias</li>
+                        </ul>
+                    </div>
+
+                    <div class="table-responsive mt-4">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nivel</th>
+                                    <th>Rango de Puntaje</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:classappend="${estudiante.nivelSaberPro == 'Nivel 4'} ? 'table-success' : ''">
+                                    <td><strong>Nivel 4</strong></td>
+                                    <td>171 - 200</td>
+                                    <td>Desempeño sobresaliente</td>
+                                </tr>
+                                <tr th:classappend="${estudiante.nivelSaberPro == 'Nivel 3'} ? 'table-warning' : ''">
+                                    <td><strong>Nivel 3</strong></td>
+                                    <td>151 - 170</td>
+                                    <td>Desempeño notable</td>
+                                </tr>
+                                <tr th:classappend="${estudiante.nivelSaberPro == 'Nivel 2'} ? 'table-primary' : ''">
+                                    <td><strong>Nivel 2</strong></td>
+                                    <td>120 - 150</td>
+                                    <td>Desempeño satisfactorio</td>
+                                </tr>
+                                <tr th:classappend="${estudiante.nivelSaberPro == 'Nivel 1'} ? 'table-secondary' : ''">
+                                    <td><strong>Nivel 1</strong></td>
+                                    <td>80 - 119</td>
+                                    <td>Desempeño básico</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTÓN REGRESAR -->
+            <div class="text-center">
+                <a th:href="@{/estudiante/dashboard}" class="btn btn-primary btn-lg">
+                    ← Volver al Dashboard
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+    .sidebar a.active {
+        background: linear-gradient(90deg, #c0d72c, #a5c31f);
+        color: #000;
+        font-weight: bold;
+    }
+</style>
+
+</body>
+</html>
