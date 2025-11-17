@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="layout/admin-layout :: head('Formulario Usuario')"></head>
+
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- SIDEBAR -->
+        <div th:replace="layout/admin-layout :: sidebar"></div>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="col-md-10 p-4">
+            
+            <!-- HEADER -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0">
+                    <span th:text="${accion}">Crear</span> Usuario
+                </h3>
+                <a th:href="@{/admin/usuarios}" class="btn btn-secondary">
+                    ⬅️ Volver
+                </a>
+            </div>
+
+            <!-- MENSAJES -->
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                ❌ <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- FORMULARIO -->
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card shadow-lg">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">📝 Datos del Usuario</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            
+                            <form th:action="@{/admin/usuarios/guardar}" 
+                                  th:object="${usuarioForm}" 
+                                  method="post">
+                                
+                                <!-- ID oculto (para edición) -->
+                                <input type="hidden" th:field="*{id}">
+
+                                <!-- Correo Electrónico -->
+                                <div class="mb-4">
+                                    <label for="correo" class="form-label">
+                                        <strong>📧 Correo Electrónico</strong>
+                                    </label>
+                                    <input type="email" 
+                                           class="form-control form-control-lg" 
+                                           id="correo"
+                                           th:field="*{correo}"
+                                           placeholder="usuario@uts.edu.co"
+                                           required>
+                                    <small class="text-muted">Será usado como nombre de usuario para iniciar sesión</small>
+                                </div>
+
+								<!-- Contraseña -->
+								<div class="mb-4">
+								    <label for="password" class="form-label">
+								        <strong>🔒 Contraseña</strong>
+								    </label>
+								    <input type="password" 
+								           class="form-control form-control-lg" 
+								           id="password"
+								           name="password"
+								           th:value="${usuarioForm.id != null ? '' : usuarioForm.password}"
+								           placeholder="Ingrese la contraseña"
+								           th:required="${usuarioForm.id == null}"
+								           minlength="3">
+								    <small class="text-muted" th:if="${usuarioForm.id != null}">
+								        ⚠️ Deja en blanco si NO deseas cambiar la contraseña
+								    </small>
+								    <small class="text-muted" th:if="${usuarioForm.id == null}">
+								        Mínimo 3 caracteres
+								    </small>
+								</div>
+
+                                <!-- Rol -->
+                                <div class="mb-4">
+                                    <label for="rol" class="form-label">
+                                        <strong>👤 Rol del Usuario</strong>
+                                    </label>
+                                    <select class="form-select form-select-lg" 
+                                            id="rol"
+                                            th:field="*{rol}"
+                                            required>
+                                        <option value="">Seleccione un rol...</option>
+                                        <option value="ADMIN">🔑 Administrador (Acceso completo)</option>
+                                        <option value="USUARIO">👤 Usuario Regular (Solo consulta)</option>
+                                    </select>
+                                    <small class="text-muted">Los administradores pueden gestionar todo el sistema</small>
+                                </div>
+
+                                <!-- Vista previa del rol -->
+                                <div class="alert alert-info" role="alert">
+                                    <strong>ℹ️ Información:</strong>
+                                    <ul class="mb-0 mt-2">
+                                        <li><strong>Administrador:</strong> Puede crear, editar y eliminar usuarios y estudiantes</li>
+                                        <li><strong>Usuario Regular:</strong> Solo puede consultar información</li>
+                                    </ul>
+                                </div>
+
+                                <!-- Botones -->
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                    <a th:href="@{/admin/usuarios}" class="btn btn-secondary btn-lg">
+                                        ❌ Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-success btn-lg">
+                                        ✅ <span th:text="${accion == 'Crear' ? 'Crear Usuario' : 'Guardar Cambios'}"></span>
+                                    </button>
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Validación del formulario
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const password = document.getElementById('password').value;
+        const isNew = document.querySelector('input[name="id"]').value === '';
+        
+        if (isNew && password.length < 6) {
+            e.preventDefault();
+            alert('La contraseña debe tener al menos 6 caracteres');
+            return false;
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparación con Otros - Saber TyT</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- SIDEBAR ESTUDIANTE -->
+        <nav class="col-md-2 sidebar p-3">
+            <h4 class="mb-4">🎓 Mi Panel</h4>
+            
+            <div class="nav flex-column">
+                <a th:href="@{/estudiante/dashboard}">📊 Dashboard</a>
+                <a th:href="@{/estudiante/identificacion}">🆔 Identificación</a>
+                <a th:href="@{/estudiante/resultado-global}">🎯 Resultado Global</a>
+                <a th:href="@{/estudiante/resultados-asignaturas}">📚 Resultados por Asignatura</a>
+                <a th:href="@{/estudiante/beneficio}">🎁 Mi Beneficio</a>
+                <a th:href="@{/estudiante/comparacion}" class="active">📈 Comparación</a>
+                <hr class="bg-white my-3">
+                <a th:href="@{/logout}" class="text-danger">🚪 Cerrar Sesión</a>
+            </div>
+        </nav>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="col-md-10 p-4">
+            
+            <!-- BREADCRUMB -->
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/estudiante/dashboard}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Comparación</li>
+                </ol>
+            </nav>
+
+            <!-- HEADER -->
+            <div class="mb-4">
+                <h2>📈 Comparación con Otros Estudiantes</h2>
+                <p class="text-muted">Análisis de tu posición relativa en el grupo</p>
+            </div>
+
+            <!-- MI POSICIÓN -->
+            <div class="card shadow-lg mb-4 border-primary" style="border-width: 3px;">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">🏆 Mi Posición en el Ranking</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="p-4 bg-light rounded shadow-sm">
+                                <div class="mb-2">
+                                    <span style="font-size: 3rem;">🥇</span>
+                                </div>
+                                <h6 class="text-muted mb-2">Mi Posición</h6>
+                                <h1 class="display-3 text-primary mb-0">#<span th:text="${posicion}">5</span></h1>
+                                <p class="text-muted mb-0">de <span th:text="${totalEstudiantes}">34</span> estudiantes</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-4 bg-light rounded shadow-sm">
+                                <div class="mb-2">
+                                    <span style="font-size: 3rem;">📊</span>
+                                </div>
+                                <h6 class="text-muted mb-2">Percentil</h6>
+                                <h1 class="display-3 text-info mb-0"><span th:text="${percentilTexto}">85.3</span>%</h1>
+                                <p class="text-muted mb-0">Superaste al <span th:text="${percentilTexto}">85.3</span>%</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-4 bg-light rounded shadow-sm">
+                                <div class="mb-2">
+                                    <span style="font-size: 3rem;">👥</span>
+                                </div>
+                                <h6 class="text-muted mb-2">Por Debajo de Ti</h6>
+                                <h1 class="display-3 text-success mb-0" th:text="${menoresPuntajes}">29</h1>
+                                <p class="text-muted mb-0">estudiantes</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-4 bg-light rounded shadow-sm">
+                                <div class="mb-2">
+                                    <span style="font-size: 3rem;">🎯</span>
+                                </div>
+                                <h6 class="text-muted mb-2">Por Encima de Ti</h6>
+                                <h1 class="display-3 text-danger mb-0" th:text="${mejoresPuntajes}">4</h1>
+                                <p class="text-muted mb-0">estudiantes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DISTRIBUCIÓN VISUAL -->
+            <div class="card shadow-lg mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">📊 Distribución Visual en el Ranking</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="mb-3 text-center">Tu Posición Relativa</h6>
+                    <div class="progress" style="height: 50px; font-size: 1.1rem;">
+                        <div class="progress-bar bg-danger d-flex align-items-center justify-content-center" 
+                             th:style="'width: ' + (${mejoresPuntajes} * 100.0 / ${totalEstudiantes}) + '%;'"
+                             th:text="${mejoresPuntajes} + ' mejores que tú'">
+                        </div>
+                        <div class="progress-bar d-flex align-items-center justify-content-center fw-bold" 
+                             style="width: 3%; background-color: #ffc107 !important; color: #000 !important;">
+                            TÚ
+                        </div>
+                        <div class="progress-bar bg-primary d-flex align-items-center justify-content-center" 
+                             th:style="'width: ' + (${menoresPuntajes} * 100.0 / ${totalEstudiantes}) + '%;'"
+                             th:text="${menoresPuntajes} + ' por debajo tuyo'">
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <p class="lead mb-2">
+                            Estás en el <strong>percentil <span th:text="${percentilTexto}">85.3</span>%</strong>
+                        </p>
+                        <p class="text-muted">
+                            Esto significa que superaste al <strong><span th:text="${percentilTexto}">85.3</span>%</strong> 
+                            de los estudiantes que presentaron la prueba
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMPARACIÓN DE PUNTAJES -->
+            <div class="card shadow-lg mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">📈 Comparación de Puntajes</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Referencia</th>
+                                    <th class="text-center">Puntaje</th>
+                                    <th class="text-center">Diferencia</th>
+                                    <th>Visualización</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="table-success">
+                                    <td><strong>🏆 Puntaje Máximo del Grupo</strong></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success fs-5" th:text="${maximo}">200</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-danger" 
+                                              th:text="'-' + ${#numbers.formatDecimal(maximo - estudiante.puntajeSaberPro, 0, 0)}">
+                                            -5
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 30px;">
+                                            <div class="progress-bar bg-success" 
+                                                 th:style="'width: ' + (${maximo} * 100.0 / 200) + '%;'"
+                                                 th:text="${maximo}">
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="table-primary fw-bold">
+                                    <td><strong>🎯 MI PUNTAJE</strong></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary fs-5" th:text="${estudiante.puntajeSaberPro}">195</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-info">REFERENCIA</span>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 30px;">
+                                            <div class="progress-bar bg-primary" 
+                                                 th:style="'width: ' + (${estudiante.puntajeSaberPro} * 100.0 / 200) + '%;'"
+                                                 th:text="${estudiante.puntajeSaberPro}">
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>📊 Promedio del Grupo</strong></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary fs-5" th:text="${promedioTexto}">137.8</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge" 
+                                              th:classappend="${estudiante.puntajeSaberPro >= promedioInt} ? 'bg-success' : 'bg-danger'"
+                                              th:text="${estudiante.puntajeSaberPro >= promedioInt} ? '+' + ${#numbers.formatDecimal(estudiante.puntajeSaberPro - promedioInt, 0, 0)} : ${#numbers.formatDecimal(estudiante.puntajeSaberPro - promedioInt, 0, 0)}">
+                                            +57.2
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 30px;">
+                                            <div class="progress-bar bg-secondary" 
+                                                 th:style="'width: ' + (${promedioInt} * 100.0 / 200) + '%;'"
+                                                 th:text="${promedioTexto}">
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="table-danger">
+                                    <td><strong>📉 Puntaje Mínimo del Grupo</strong></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-danger fs-5" th:text="${minimo}">96</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success" 
+                                              th:text="'+' + ${#numbers.formatDecimal(estudiante.puntajeSaberPro - minimo, 0, 0)}">
+                                            +99
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 30px;">
+                                            <div class="progress-bar bg-danger" 
+                                                 th:style="'width: ' + (${minimo} * 100.0 / 200) + '%;'"
+                                                 th:text="${minimo}">
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRÁFICO COMPARATIVO -->
+            <div class="card shadow-lg mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📊 Gráfico Comparativo de Puntajes</h5>
+                </div>
+                <div class="card-body bg-light">
+                    <canvas id="chartComparativo" style="max-height: 350px;"></canvas>
+                </div>
+            </div>
+
+            <!-- INTERPRETACIÓN DEL RESULTADO -->
+            <div class="card shadow-lg mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">💡 Interpretación de tu Posición</h5>
+                </div>
+                <div class="card-body">
+                    <div th:if="${percentil >= 90}" class="alert alert-success">
+                        <h5 class="alert-heading">🌟 ¡Excelente Posición!</h5>
+                        <hr>
+                        <p>Tu puntaje te ubica en el <strong>top 10%</strong> del grupo. Este es un logro excepcional que demuestra:</p>
+                        <ul class="mb-0">
+                            <li>Dominio sobresaliente de las competencias evaluadas</li>
+                            <li>Preparación académica superior al promedio</li>
+                            <li>Alto nivel de desarrollo en habilidades críticas</li>
+                            <li>Capacidad competitiva a nivel profesional</li>
+                        </ul>
+                    </div>
+
+                    <div th:if="${percentil >= 75 && percentil < 90}" class="alert alert-primary">
+                        <h5 class="alert-heading">⭐ ¡Muy Buena Posición!</h5>
+                        <hr>
+                        <p>Tu puntaje te ubica en el <strong>cuartil superior</strong> del grupo. Esto indica:</p>
+                        <ul class="mb-0">
+                            <li>Desempeño notable por encima del promedio</li>
+                            <li>Buen dominio de las competencias evaluadas</li>
+                            <li>Preparación académica sólida</li>
+                            <li>Posición competitiva dentro del grupo</li>
+                        </ul>
+                    </div>
+
+                    <div th:if="${percentil >= 50 && percentil < 75}" class="alert alert-info">
+                        <h5 class="alert-heading">✅ Posición Media-Alta</h5>
+                        <hr>
+                        <p>Tu puntaje te ubica <strong>por encima de la mitad</strong> del grupo. Esto significa:</p>
+                        <ul class="mb-0">
+                            <li>Desempeño satisfactorio en las competencias</li>
+                            <li>Estás por encima del promedio del grupo</li>
+                            <li>Hay áreas de oportunidad para mejorar</li>
+                            <li>Posición favorable en el ranking general</li>
+                        </ul>
+                    </div>
+
+                    <div th:if="${percentil >= 25 && percentil < 50}" class="alert alert-warning">
+                        <h5 class="alert-heading">📊 Posición Media</h5>
+                        <hr>
+                        <p>Tu puntaje te ubica en la <strong>mitad inferior</strong> del grupo. Considera:</p>
+                        <ul class="mb-0">
+                            <li>Hay espacio significativo para mejorar</li>
+                            <li>Identifica las áreas donde obtuviste menor puntaje</li>
+                            <li>Busca apoyo académico en competencias específicas</li>
+                            <li>Prepárate mejor para futuras evaluaciones</li>
+                        </ul>
+                    </div>
+
+                    <div th:if="${percentil < 25}" class="alert alert-secondary">
+                        <h5 class="alert-heading">📌 Área de Mejora</h5>
+                        <hr>
+                        <p>Tu puntaje te ubica en el <strong>cuartil inferior</strong> del grupo. Recomendaciones:</p>
+                        <ul class="mb-0">
+                            <li>Refuerza tus conocimientos en las competencias básicas</li>
+                            <li>Solicita orientación académica personalizada</li>
+                            <li>Participa en cursos de nivelación disponibles</li>
+                            <li>Dedica más tiempo a la preparación</li>
+                        </ul>
+                    </div>
+
+                    <div class="card bg-light mt-4">
+                        <div class="card-body">
+                            <h6 class="mb-3"><strong>📈 Estadísticas de tu Rendimiento:</strong></h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">✓ Posición: <strong>#<span th:text="${posicion}">5</span> de <span th:text="${totalEstudiantes}">34</span></strong></li>
+                                        <li class="mb-2">✓ Percentil: <strong><span th:text="${percentilTexto}">85.3</span>%</strong></li>
+                                        <li>✓ Por encima del promedio: 
+                                            <strong th:if="${estudiante.puntajeSaberPro >= promedioInt}">SÍ</strong>
+                                            <strong th:unless="${estudiante.puntajeSaberPro >= promedioInt}">NO</strong>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">✓ Diferencia con el máximo: <strong th:text="${maximo - estudiante.puntajeSaberPro}">5</strong> puntos</li>
+                                        <li class="mb-2">✓ Diferencia con el promedio: <strong th:text="${#numbers.formatDecimal(estudiante.puntajeSaberPro - promedioInt, 0, 1)}">+57.2</strong> puntos</li>
+                                        <li>✓ Diferencia con el mínimo: <strong th:text="${estudiante.puntajeSaberPro - minimo}">99</strong> puntos</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTÓN REGRESAR -->
+            <div class="text-center">
+                <a th:href="@{/estudiante/dashboard}" class="btn btn-primary btn-lg">
+                    ← Volver al Dashboard
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+    const ctx = document.getElementById('chartComparativo');
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Puntaje\nMínimo', 'Promedio\nGrupo', 'TU\nPUNTAJE', 'Puntaje\nMáximo'],
+            datasets: [{
+                label: 'Puntajes',
+				data: [
+				    [[${minimo}]],
+				    [[${promedioInt}]],
+				    [[${estudiante.puntajeSaberPro}]],
+				    [[${maximo}]]
+				],
+                backgroundColor: [
+                    'rgba(220, 53, 69, 0.8)',
+                    'rgba(108, 117, 125, 0.8)',
+                    'rgba(0, 123, 255, 0.9)',
+                    'rgba(40, 167, 69, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(220, 53, 69, 1)',
+                    'rgba(108, 117, 125, 1)',
+                    'rgba(0, 123, 255, 1)',
+                    'rgba(40, 167, 69, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 200,
+                    ticks: {
+                        stepSize: 40,
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Comparación de Puntajes - Escala 0-200',
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+<style>
+    .sidebar a.active {
+        background: linear-gradient(90deg, #c0d72c, #a5c31f);
+        color: #000;
+        font-weight: bold;
+    }
+</style>
+
+</body>
+</html>

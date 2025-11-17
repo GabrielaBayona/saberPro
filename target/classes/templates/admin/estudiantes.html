@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="layout/admin-layout :: head('Estudiantes')"></head>
+
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- SIDEBAR -->
+        <div th:replace="layout/admin-layout :: sidebar"></div>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="col-md-10 p-4">
+            
+            <!-- HEADER CON BÚSQUEDA -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0">📚 Lista de Estudiantes</h3>
+                
+                <div class="d-flex gap-2">
+                    <!-- BUSCADOR COMPACTO -->
+                    <form th:action="@{/admin/estudiantes}" method="get" class="d-flex gap-2">
+                        <input type="text" 
+                               class="form-control" 
+                               name="busqueda" 
+                               th:value="${busqueda}"
+                               placeholder="Buscar estudiante..."
+                               style="width: 250px;">
+                        <button type="submit" class="btn btn-primary">
+                            🔍
+                        </button>
+                        <a th:if="${mostrandoResultados}" 
+                           th:href="@{/admin/estudiantes}" 
+                           class="btn btn-outline-secondary"
+                           title="Limpiar búsqueda">
+                            ✖️
+                        </a>
+                    </form>
+                    
+                    <a th:href="@{/admin/dashboard}" class="btn btn-secondary">
+                        ⬅️ Volver
+                    </a>
+                </div>
+            </div>
+
+            <!-- MENSAJE DE BÚSQUEDA O TOTAL -->
+            <div th:if="${mostrandoResultados}" class="alert alert-info mb-4">
+                📊 <strong th:text="${totalEstudiantes}">0</strong> resultado(s) para: 
+                "<strong th:text="${busqueda}"></strong>"
+            </div>
+
+            <div th:unless="${mostrandoResultados}" class="alert alert-success mb-4">
+                ✅ Mostrando <strong th:text="${totalEstudiantes}">0</strong> estudiante(s) activo(s)
+            </div>
+
+            <!-- TABLA DE ESTUDIANTES -->
+            <div class="card shadow-lg">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h5 class="mb-0">
+                        📊 Listado Completo de Estudiantes
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    
+                    <!-- MENSAJE SI NO HAY RESULTADOS -->
+                    <div th:if="${estudiantes.isEmpty()}" class="text-center p-5">
+                        <div style="font-size: 4rem;">😕</div>
+                        <h4 class="text-muted mt-3">No se encontraron estudiantes</h4>
+                        <p th:if="${mostrandoResultados}">
+                            No hay resultados para "<strong th:text="${busqueda}"></strong>"
+                        </p>
+                        <a th:href="@{/admin/estudiantes}" class="btn btn-primary mt-3">
+                            Ver todos los estudiantes
+                        </a>
+                    </div>	
+					
+					<!-- ESTADÍSTICAS RÁPIDAS -->
+					            <div class="row g-3 mt-4" th:unless="${estudiantes.isEmpty()}">
+					                <div class="col-md-3">
+					                    <div class="card text-center p-3 h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+					                        <small class="mb-2">📊 Promedio General</small>
+					                        <h3 class="mb-0" th:text="${promedio}">150.5</h3>
+					                    </div>
+					                </div>
+					                
+					                <div class="col-md-3">
+					                    <div class="card text-center p-3 h-100" style="background: linear-gradient(135deg, #6aa700 0%, #a5c31f 100%); color: white;">
+					                        <small class="mb-2">🏆 Puntaje Más Alto</small>
+					                        <h3 class="mb-0" th:text="${maximo}">200</h3>
+					                    </div>
+					                </div>
+					                
+					                <div class="col-md-3">
+					                    <div class="card text-center p-3 h-100" style="background: linear-gradient(135deg, #ff4757 0%, #ff6348 100%); color: white;">
+					                        <small class="mb-2">📉 Puntaje Más Bajo</small>
+					                        <h3 class="mb-0" th:text="${minimo}">96</h3>
+					                    </div>
+					                </div>
+					                
+					                <div class="col-md-3">
+					                    <div class="card text-center p-3 h-100" style="background: linear-gradient(135deg, #c0d72c 0%, #9edc3b 100%); color: #000;">
+					                        <small class="mb-2">⭐ Estudiantes Nivel 4</small>
+					                        <h3 class="mb-0" th:text="${nivel4}">2</h3>
+					                    </div>
+					                </div>
+					            </div>
+
+					            <!-- DISTRIBUCIÓN POR NIVELES -->
+					            <div class="card mt-4" th:unless="${estudiantes.isEmpty()}">
+					                <div class="card-header bg-info text-white">
+					                    <h5 class="mb-0">📈 Distribución por Niveles</h5>
+					                </div>
+					                <div class="card-body">
+					                    <div class="row text-center">
+					                        <div class="col-md-3">
+					                            <div class="p-3">
+					                                <h2 class="text-primary" th:text="${nivel4}">0</h2>
+					                                <p class="mb-0"><strong>Nivel 4</strong></p>
+					                                <small class="text-muted">Excelente</small>
+					                            </div>
+					                        </div>
+					                        <div class="col-md-3">
+					                            <div class="p-3">
+					                                <h2 class="text-success" th:text="${nivel3}">0</h2>
+					                                <p class="mb-0"><strong>Nivel 3</strong></p>
+					                                <small class="text-muted">Bueno</small>
+					                            </div>
+					                        </div>
+					                        <div class="col-md-3">
+					                            <div class="p-3">
+					                                <h2 class="text-warning" th:text="${nivel2}">0</h2>
+					                                <p class="mb-0"><strong>Nivel 2</strong></p>
+					                                <small class="text-muted">Aceptable</small>
+					                            </div>
+					                        </div>
+					                        <div class="col-md-3">
+					                            <div class="p-3">
+					                                <h2 class="text-secondary" th:text="${nivel1}">0</h2>
+					                                <p class="mb-0"><strong>Nivel 1</strong></p>
+					                                <small class="text-muted">Básico</small>
+					                            </div>
+					                        </div>
+					                    </div>
+					                </div>
+					            </div>
+
+                    <!-- TABLA CON DATOS -->
+                    <div th:unless="${estudiantes.isEmpty()}" class="table-responsive">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead class="table-dark sticky-top">
+                                <tr>
+                                    <th class="text-center">#</th>
+                                    <th>Número de Registro</th>
+                                    <th>Apellido</th>
+                                    <th class="text-center">Puntaje Saber Pro</th>
+                                    <th class="text-center">Nivel</th>
+                                    <th class="text-center">Com. Escrita</th>
+                                    <th class="text-center">Razonamiento</th>
+                                    <th class="text-center">Lect. Crítica</th>
+                                    <th class="text-center">Inglés</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="estudiante, iter : ${estudiantes}" 
+                                    class="align-middle"
+                                    style="transition: all 0.3s;">
+                                    
+                                    <td class="text-center">
+                                        <strong th:text="${iter.count}">1</strong>
+                                    </td>
+                                    
+                                    <td>
+                                        <code class="bg-light p-1 rounded" 
+                                              th:text="${estudiante.numeroRegistro}">EK20183007722</code>
+                                    </td>
+                                    
+                                    <td>
+                                        <strong th:text="${estudiante.primerApellido}">BARBOSA</strong>
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <span class="badge fs-6 px-3 py-2" 
+                                              th:classappend="${estudiante.puntajeSaberPro >= 180} ? 'bg-success' : 
+                                                              (${estudiante.puntajeSaberPro >= 150} ? 'bg-primary' : 
+                                                              (${estudiante.puntajeSaberPro >= 120} ? 'bg-warning text-dark' : 'bg-secondary'))"
+                                              th:text="${estudiante.puntajeSaberPro}">200</span>
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <small class="text-muted" th:text="${estudiante.nivelSaberPro}">Nivel 4</small>
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <span th:text="${estudiante.comunicacionEscrita}">128</span>
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <span th:text="${estudiante.razonamientoCuantitativo}">182</span>
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <span th:text="${estudiante.lecturaCritica}">202</span>
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <span class="badge bg-info" th:text="${estudiante.nivelIngles}">B1</span>
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <span class="badge" 
+                                              th:classappend="${estudiante.estado == 'ACTIVO'} ? 'bg-success' : 'bg-danger'"
+                                              th:text="${estudiante.estado}">ACTIVO</span>
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <a th:href="@{/admin/estudiantes/{id}(id=${estudiante.id})}" 
+                                           class="btn btn-sm btn-info">
+                                            👁️ Ver
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+			<!-- ESTUDIANTES ANULADOS -->
+			            <div class="card shadow-lg mt-4" th:if="${!anulados.isEmpty()}">
+			                <div class="card-header text-white" style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);">
+			                    <h5 class="mb-0">
+			                        🚫 Estudiantes con Prueba Anulada - 
+			                        <span class="badge bg-light text-dark" th:text="${anulados.size()}">0</span>
+			                    </h5>
+			                </div>
+			                <div class="card-body">
+			                    <div class="alert alert-dark">
+			                        <strong>ℹ️ INFORMACIÓN:</strong> Estos estudiantes tuvieron su prueba anulada por el ICFES. 
+			                        Deben presentar nuevamente la prueba Saber TyT.
+			                    </div>
+			                    <div class="table-responsive">
+			                        <table class="table table-hover mb-0">
+			                            <thead class="table-dark">
+			                                <tr>
+			                                    <th class="text-center">#</th>
+			                                    <th>Número de Registro</th>
+			                                    <th>Apellido</th>
+			                                    <th class="text-center">Estado</th>
+			                                    <th>Observación</th>
+			                                    <th class="text-center">Acciones</th>
+			                                </tr>
+			                            </thead>
+			                            <tbody>
+			                                <tr th:each="est, iter : ${anulados}">
+			                                    <td class="text-center">
+			                                        <strong th:text="${iter.count}">1</strong>
+			                                    </td>
+			                                    
+			                                    <td>
+			                                        <code class="bg-light p-1 rounded" 
+			                                              th:text="${est.numeroRegistro}">EK20183207870</code>
+			                                    </td>
+			                                    
+			                                    <td>
+			                                        <strong th:text="${est.primerApellido}">HIGUERA</strong>
+			                                    </td>
+			                                    
+			                                    <td class="text-center">
+			                                        <span class="badge bg-dark fs-6 px-3 py-2">ANULADO</span>
+			                                    </td>
+			                                    
+			                                    <td>
+			                                        <small class="text-muted">
+			                                            🚫 Debe presentar nuevamente Saber TyT
+			                                        </small>
+			                                    </td>
+			                                    
+			                                    <td class="text-center">
+			                                        <a th:href="@{/admin/estudiantes/{id}(id=${est.id})}" 
+			                                           class="btn btn-sm btn-secondary">
+			                                            👁️ Ver
+			                                        </a>
+			                                    </td>
+			                                </tr>
+			                            </tbody>
+			                        </table>
+			                    </div>
+			                </div>
+			            </div>
+
+			        </div>
+
+			    </div>
+			</div>
+
+			<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+			<style>
+			    /* Efecto hover en las filas */
+			    tbody tr:hover {
+			        background-color: rgba(192, 215, 44, 0.1) !important;
+			        transform: scale(1.01);
+			        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+			        transition: all 0.3s;
+			    }
+			    
+			    /* Thead fijo al hacer scroll */
+			    .table-responsive {
+			        max-height: 600px;
+			        overflow-y: auto;
+			    }
+			    
+			    .sticky-top {
+			        position: sticky;
+			        top: 0;
+			        z-index: 10;
+			    }
+			</style>
+
+			</body>
+			</html>

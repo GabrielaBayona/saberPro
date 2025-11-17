@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es"
+      th:replace="layout/admin-layout :: layout(
+            title = ${usuario.id == null ? 'Registrar Usuario' : 'Editar Usuario'},
+            content = 'thisContent'
+      )">
+
+<div th:fragment="thisContent">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 th:text="${usuario.id == null ? 'Registrar Usuario' : 'Editar Usuario'}"></h3>
+
+        <a class="btn btn-secondary" th:href="@{/admin/usuarios}">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+    </div>
+
+    <div class="card p-4">
+
+        <form th:action="@{/admin/usuarios/guardar}" method="post">
+
+            <input type="hidden" th:field="${usuario.id}">
+
+            <!-- Correo -->
+            <div class="mb-3">
+                <label class="form-label">Correo</label>
+                <input type="email" class="form-control"
+                       th:field="${usuario.correo}" required>
+            </div>
+
+            <!-- Contraseña -->
+            <div class="mb-3">
+                <label class="form-label">Contraseña</label>
+
+                <input type="password"
+                       class="form-control"
+                       th:placeholder="${usuario.id == null ? '' : 'Dejar vacío para no cambiar'}"
+                       th:field="${usuario.password}">
+            </div>
+
+            <!-- Roles -->
+            <div class="mb-3">
+                <label class="form-label">Rol</label>
+                <select class="form-select" th:field="${usuario.rol}">
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="COORDINADOR">COORDINADOR</option>
+                    <option value="ESTUDIANTE">ESTUDIANTE</option>
+                    <option value="DOCENTE">DOCENTE</option>
+                </select>
+            </div>
+
+            <button class="btn btn-success" type="submit">
+                <i class="bi bi-check-circle"></i> Guardar
+            </button>
+
+            <a th:href="@{/admin/usuarios}" class="btn btn-secondary">
+                Cancelar
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+</html>
