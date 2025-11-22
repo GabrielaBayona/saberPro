@@ -232,12 +232,14 @@
 									           title="Editar">
 									            ✏️
 									        </a>
-									        <button type="button" 
-									                class="btn btn-sm btn-danger" 
-									                onclick="confirmarEliminacion([[${estudiante.id}]], '[[${estudiante.primerApellido}]]')"
-									                title="Eliminar">
-									            🗑️
-									        </button>
+											<form th:action="@{/admin/estudiantes/eliminar/{id}(id=${estudiante.id})}" 
+											              method="post" 
+											              style="display: inline-block; margin: 0;"
+											              onsubmit="return confirm('¿Está seguro de eliminar este estudiante?\n\nEsta acción no se puede deshacer.');">
+											            <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+											                🗑️
+											            </button>
+											</form>
 									    </div>
 									</td>
                                 </tr>
@@ -351,6 +353,8 @@
 			    }
 			}
 			</script>
+			
+			
 
 			</body>
 			</html>

@@ -3,6 +3,8 @@ package com.saberpro.app.controllers;
 import com.saberpro.app.models.Estudiante;
 import com.saberpro.app.models.Usuario;
 import com.saberpro.app.repositories.EstudianteRepository;
+import com.saberpro.app.repositories.UsuarioRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -154,6 +156,9 @@ public class AdminEstudianteController {
         return "admin/estudiante-form";
     }
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+    
     @PostMapping("/guardar")
     public String guardar(@ModelAttribute Estudiante estudiante, 
                          HttpSession session,
@@ -171,16 +176,45 @@ public class AdminEstudianteController {
             // Calcular puntaje promedio general
             calcularPuntajeGeneral(estudiante);
             
+            // Guardar el estudiante
             estudianteRepository.save(estudiante);
             
-            redirectAttributes.addFlashAttribute("success", 
-                "✅ Estudiante guardado exitosamente");
+            // ✅ CREAR USUARIO AUTOMÁTICAMENTE (solo si NO está editando)
+            if (estudiante.getId() == null && estudiante.getPrimerApellido() != null) {
+                String apellido = estudiante.getPrimerApellido().toLowerCase().trim();
+                String correo = apellido + "@uts.edu.co";
+                
+                // Verificar si ya existe
+                Usuario usuarioExistente = usuarioRepository.findByCorreo(correo);
+                
+                if (usuarioExistente == null) {
+                    Usuario nuevoUsuario = new Usuario();
+                    nuevoUsuario.setCorreo(correo);
+                    nuevoUsuario.setPassword(apellido + "123");
+                    nuevoUsuario.setRol("USUARIO");
+                    
+                    usuarioRepository.save(nuevoUsuario);
+                    
+                    redirectAttributes.addFlashAttribute("success", 
+                        "✅ Estudiante y usuario creados exitosamente. Credenciales: " + correo + " / " + apellido + "123");
+                } else {
+                    redirectAttributes.addFlashAttribute("success", 
+                        "✅ Estudiante guardado (el usuario " + correo + " ya existía)");
+                }
+            } else if (estudiante.getId() != null) {
+                // Solo está editando
+                redirectAttributes.addFlashAttribute("success", 
+                    "✅ Estudiante actualizado exitosamente");
+            } else {
+                redirectAttributes.addFlashAttribute("success", 
+                    "✅ Estudiante guardado");
+            }
             
             return "redirect:/admin/estudiantes";
             
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", 
-                "❌ Error al guardar el estudiante: " + e.getMessage());
+                "❌ Error al guardar: " + e.getMessage());
             return "redirect:/admin/estudiantes/nuevo";
         }
     }

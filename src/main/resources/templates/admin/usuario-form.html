@@ -16,9 +16,11 @@
             
             <!-- HEADER -->
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="mb-0">
-                    <span th:text="${accion}">Crear</span> Usuario
-                </h3>
+				<h3 class="mb-0">
+				    <span th:if="${modoEdicion}">✏️ Editar</span>
+				    <span th:unless="${modoEdicion}">➕ Crear</span>
+				    Usuario
+				</h3>
                 <a th:href="@{/admin/usuarios}" class="btn btn-secondary">
                     ⬅️ Volver
                 </a>
@@ -65,19 +67,18 @@
 								    <label for="password" class="form-label">
 								        <strong>🔒 Contraseña</strong>
 								    </label>
-								    <input type="password" 
+								    <input type="text" 
 								           class="form-control form-control-lg" 
 								           id="password"
-								           name="password"
-								           th:value="${usuarioForm.id != null ? '' : usuarioForm.password}"
+								           th:field="*{password}"
 								           placeholder="Ingrese la contraseña"
-								           th:required="${usuarioForm.id == null}"
+								           required
 								           minlength="3">
 								    <small class="text-muted" th:if="${usuarioForm.id != null}">
-								        ⚠️ Deja en blanco si NO deseas cambiar la contraseña
+								        La contraseña actual se mostrará. Puedes modificarla si lo deseas.
 								    </small>
 								    <small class="text-muted" th:if="${usuarioForm.id == null}">
-								        Mínimo 3 caracteres
+								        Mínimo 3 caracteres. Recomendado: apellido123
 								    </small>
 								</div>
 
@@ -111,9 +112,10 @@
                                     <a th:href="@{/admin/usuarios}" class="btn btn-secondary btn-lg">
                                         ❌ Cancelar
                                     </a>
-                                    <button type="submit" class="btn btn-success btn-lg">
-                                        ✅ <span th:text="${accion == 'Crear' ? 'Crear Usuario' : 'Guardar Cambios'}"></span>
-                                    </button>
+									<button type="submit" class="btn btn-success btn-lg">
+									    <span th:if="${modoEdicion}">💾 Guardar Cambios</span>
+									    <span th:unless="${modoEdicion}">✅ Crear Usuario</span>
+									</button>
                                 </div>
 
                             </form>
